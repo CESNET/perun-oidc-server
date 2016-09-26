@@ -1,0 +1,73 @@
+.logos {
+	display: table;
+	margin: 0px auto 20px auto;
+}
+.logos img {
+	height: 128px;
+}
+.logos img.arrow {
+	margin: 32px;
+	height: 64px;
+}
+@media (max-width: 480px) {
+	.logos img {
+		height: 64px;
+	}
+	.logos img.arrow {
+		margin: 16px;
+		height: 32px;
+	}
+}
+
+
+.approve-scopes {
+	margin-bottom: 5px;
+}
+
+h1, h2, h3, h4 {
+	font-weight: normal;
+}
+
+.scopes {
+	margin-bottom: 40px;
+}
+label.scope {
+	border-top: 1px solid #ddd;
+	padding: 10px 20px;
+	margin: 0px;
+	font-weight: bold;
+}
+
+label.scope {
+	border-top: 1px solid #ddd;
+	padding: 10px 20px;
+	margin: 0px;
+	font-weight: bold;
+}
+
+label.scope ul.claims {
+	font-weight: normal;
+	list-style-type: none;
+	margin: 0 0 0 19px;
+	word-break: break-all;
+}
+
+
+.clientinfo {
+	margin-bottom: 40px;
+}
+
+
+.answer-btns > div {
+	margin-bottom: 10px;
+}
+
+
+.remember {
+	margin-bottom: 30px;
+}
+
+
+.more-info-btn {
+	cursor: pointer;
+}
