@@ -2,6 +2,7 @@ package cz.metacentrum.perun.oidc.overlay;
 
 import cz.metacentrum.perun.oidc.client.PerunPrincipal;
 import cz.metacentrum.perun.oidc.client.PerunUtils;
+import org.mitre.openid.connect.web.AuthenticationTimeStamper;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +25,7 @@ public class PerunAuthenticationDetailSource implements AuthenticationDetailsSou
 		additionalInfo.put("userExtSourceLogin", pp.getUserExtSourceLogin());
 		additionalInfo.put("extSourceType", pp.getExtSourceType());
 		additionalInfo.put("extSourceLoa", String.valueOf(pp.getExtSourceLoa()));
+		additionalInfo.put(AuthenticationTimeStamper.AUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis()));
 
 		PerunWebAuthenticationDetails details = new PerunWebAuthenticationDetails(context, additionalInfo);
 
