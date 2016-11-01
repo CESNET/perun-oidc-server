@@ -31,7 +31,7 @@
 
 
 			<div class="logos">
-				<img class="elixir-logo" src="resources/images/ELIXIR_logo.png" />
+				<img class="elixir-logo" src="${perunConfig.instanceLogoUrl}" />
 				<c:if test="${ not empty client.logoUri }">
 					<img class="arrow" src="resources/images/arrow.png" />
 					<img class="service-logo" src="api/clients/${ client.id }/logo" />

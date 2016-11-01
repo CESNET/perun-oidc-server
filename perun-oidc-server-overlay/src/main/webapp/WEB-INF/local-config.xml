@@ -31,4 +31,11 @@
 <!-- Empty: Override this file in your local project to change configuration options. -->
 	<context:component-scan annotation-config="true" base-package="cz.metacentrum.perun.oidc" />
 
+	<bean id="perunConfig" class="cz.metacentrum.perun.oidc.overlay.PerunConfigurationBean" />
+
+	<mvc:interceptors>
+		<!-- Inject our own configuration into the response so it can be used in views like ${perunConfig.logoUrl} -->
+		<bean id="perunConfigInterceptor" class="cz.metacentrum.perun.oidc.overlay.PerunConfigInterceptor" />
+	</mvc:interceptors>
+
 </beans>
