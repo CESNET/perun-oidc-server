@@ -1,12 +1,9 @@
 package cz.metacentrum.perun.oidc.overlay;
 
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Map;
 
 /**

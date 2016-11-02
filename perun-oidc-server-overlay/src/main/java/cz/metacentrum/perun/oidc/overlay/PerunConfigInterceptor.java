@@ -27,11 +27,10 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * 
- * Injects the server configuration bean into the request context.
- * This allows JSPs and the like to call "config.logoUrl" among others.
- * 
- * @author jricher
+ * Injects our own configuration bean into the request context.
+ * This allows JSPs and the like to call "perunConfig.instanceLogoUrl" among others.
  *
+ * @author Ondrej Velisek <ondrejvelisek@gmail.com>
  */
 public class PerunConfigInterceptor extends HandlerInterceptorAdapter {
 

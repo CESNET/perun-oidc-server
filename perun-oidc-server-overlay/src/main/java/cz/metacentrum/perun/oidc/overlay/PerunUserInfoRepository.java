@@ -1,15 +1,8 @@
 package cz.metacentrum.perun.oidc.overlay;
 
-import com.google.gson.JsonObject;
 import cz.metacentrum.perun.oidc.client.OidcManager;
-import cz.metacentrum.perun.oidc.client.PerunUser;
-import cz.metacentrum.perun.oidc.client.UsersManager;
-import org.mitre.openid.connect.model.DefaultUserInfo;
 import org.mitre.openid.connect.model.UserInfo;
 import org.mitre.openid.connect.repository.UserInfoRepository;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import java.util.Map;
 
 /**
  * @author Ondrej Velisek <ondrejvelisek@gmail.com>

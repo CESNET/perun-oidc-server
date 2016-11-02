@@ -31,9 +31,13 @@
 
 
 			<div class="logos">
-				<img class="elixir-logo" src="${perunConfig.instanceLogoUrl}" />
-				<c:if test="${ not empty client.logoUri }">
+				<c:if test="${ not empty perunConfig.instanceLogoUrl }">
+					<img class="elixir-logo" src="${perunConfig.instanceLogoUrl}" />
+				</c:if>
+				<c:if test="${ (not empty perunConfig.instanceLogoUrl) && (not empty client.logoUri) }">
 					<img class="arrow" src="resources/images/arrow.png" />
+				</c:if>
+				<c:if test="${ not empty client.logoUri }">
 					<img class="service-logo" src="api/clients/${ client.id }/logo" />
 				</c:if>
 			</div>

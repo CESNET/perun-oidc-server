@@ -16,19 +16,7 @@
  *******************************************************************************/
 package cz.metacentrum.perun.oidc.overlay;
 
-import com.google.common.collect.Lists;
-import com.google.gson.Gson;
 import cz.metacentrum.perun.oidc.client.PerunUtils;
-import org.mitre.openid.connect.config.ConfigurationPropertiesBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.context.annotation.Bean;
-import org.springframework.util.StringUtils;
-
-import javax.annotation.PostConstruct;
-import java.util.List;
-import java.util.Locale;
 
 
 /**
@@ -40,7 +28,7 @@ import java.util.Locale;
 public class PerunConfigurationBean {
 
 	public String getInstanceLogoUrl() {
-		return PerunUtils.getProperty("oidc.logoUrl");
+		return PerunUtils.getProperty("oidc.logoUrl", false);
 	}
 
 }
