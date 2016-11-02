@@ -1,4 +1,5 @@
 package cz.metacentrum.perun.oidc.client;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -30,12 +31,14 @@ public class PerunUtils {
 	private static final String PROPERTIES_FILE = "/etc/perun/perun-oidc-server.properties";
 
 	/**
-	 * Gets particular property from perun.properties file.
+	 * Gets particular property from oidc-properties.properties file.
 	 *
 	 * @param propertyName name of the property
-	 * @return value of the property
+	 * @param required if requested property is required. If it is and it is not defined, exception is thrown.
+	 *                 if it is false, null is returned.
+	 * @return value of the property, null if it is not defined
 	 */
-	public static String getProperty(String propertyName) {
+	public static String getProperty(String propertyName, boolean required) {
 		if (propertyName == null) {
 			throw new IllegalArgumentException("Requested property name is null");
 		}
@@ -51,12 +54,15 @@ public class PerunUtils {
 		}
 
 		String property = properties.getProperty(propertyName);
-		if (property == null) {
+		if (property == null && required) {
 			throw new RuntimeException("Property " + propertyName + " cannot be found in the configuration file");
 		}
 		return property;
 	}
 
+	public static String getProperty(String propertyName) {
+		return getProperty(propertyName, true);
+	}
 
 	public static PerunPrincipal parsePrincipal(HttpServletRequest req) {
 

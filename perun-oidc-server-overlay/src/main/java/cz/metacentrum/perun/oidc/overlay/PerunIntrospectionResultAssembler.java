@@ -21,13 +21,9 @@ import org.mitre.oauth2.model.OAuth2RefreshTokenEntity;
 import org.mitre.oauth2.service.IntrospectionResultAssembler;
 import org.mitre.oauth2.service.impl.DefaultIntrospectionResultAssembler;
 import org.mitre.openid.connect.model.UserInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Set;
-
-import static com.google.common.collect.Maps.newLinkedHashMap;
 
 /**
  * Default implementation of the {@link IntrospectionResultAssembler} interface.
