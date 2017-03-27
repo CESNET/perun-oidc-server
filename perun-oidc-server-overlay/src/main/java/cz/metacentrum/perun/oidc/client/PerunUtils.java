@@ -1,5 +1,8 @@
 package cz.metacentrum.perun.oidc.client;
 
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -8,10 +11,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -29,6 +35,7 @@ public class PerunUtils {
 	public static final String EXTSOURCE_NAME_LOCAL = "LOCAL";
 
 	private static final String PROPERTIES_FILE = "/etc/perun/perun-oidc-server.properties";
+	private static final String SCOPES_FILE = "/etc/perun/perun-oidc-scopes.properties";
 
 	/**
 	 * Gets particular property from oidc-properties.properties file.
@@ -58,6 +65,51 @@ public class PerunUtils {
 			throw new RuntimeException("Property " + propertyName + " cannot be found in the configuration file");
 		}
 		return property;
+	}
+
+	public static List<String> getScopes() {
+		// Load scopes file
+		Properties properties = new Properties();
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(SCOPES_FILE))) {
+			properties.load(bis);
+		} catch (FileNotFoundException e) {
+			throw new IllegalArgumentException("Cannot find "+SCOPES_FILE+" file", e);
+		} catch (IOException e) {
+			throw new RuntimeException("Cannot read "+SCOPES_FILE+" file", e);
+		}
+
+		List<String> scopes = new ArrayList<>();
+		for (Object scope : properties.keySet()) {
+			scopes.add(scope.toString());
+		}
+		return scopes;
+	}
+
+	public static List<String> getClaims() {
+		// Load scopes file
+		Properties properties = new Properties();
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(SCOPES_FILE))) {
+			properties.load(bis);
+		} catch (FileNotFoundException e) {
+			throw new IllegalArgumentException("Cannot find "+SCOPES_FILE+" file", e);
+		} catch (IOException e) {
+			throw new RuntimeException("Cannot read "+SCOPES_FILE+" file", e);
+		}
+
+		ObjectMapper mapper = new ObjectMapper();
+		List<String> claimsList = new ArrayList<>();
+		for (Object scope : properties.keySet()) {
+			try {
+				ObjectNode claims = (ObjectNode) mapper.readTree(scope.toString());
+				Iterator<String> iter = claims.getFieldNames();
+				while (iter.hasNext()) {
+					claimsList.add(iter.next());
+				}
+			} catch (IOException e) {
+			throw new IllegalArgumentException("Config file "+ SCOPES_FILE +" is wrongly configured. Values have to be valid JSON objects.", e);
+			}
+		}
+		return claimsList;
 	}
 
 	public static String getProperty(String propertyName) {

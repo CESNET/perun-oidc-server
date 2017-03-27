@@ -18,6 +18,8 @@ package cz.metacentrum.perun.oidc.overlay;
 
 import cz.metacentrum.perun.oidc.client.PerunUtils;
 
+import java.util.List;
+
 
 /**
  * Bean to hold configuration information that must be injected into various parts
@@ -29,6 +31,18 @@ public class PerunConfigurationBean {
 
 	public String getInstanceLogoUrl() {
 		return PerunUtils.getProperty("oidc.logoUrl", false);
+	}
+
+	public String getOidcPerunUrl() {
+		return PerunUtils.getProperty("oidc.perun.url");
+	}
+
+	public List<String> getScopes() {
+		return PerunUtils.getScopes();
+	}
+
+	public List<String> getClaims() {
+		return PerunUtils.getClaims();
 	}
 
 }

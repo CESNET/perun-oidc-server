@@ -58,4 +58,6 @@
 
 	<bean id="defaultIntrospectionResultAssembler" class="cz.metacentrum.perun.oidc.overlay.PerunIntrospectionResultAssembler" primary="true" />
 
+	<bean id="discoveryEndpoint" class="cz.metacentrum.perun.oidc.overlay.DiscoveryEndpoint" primary="true" />
+
 </beans>
