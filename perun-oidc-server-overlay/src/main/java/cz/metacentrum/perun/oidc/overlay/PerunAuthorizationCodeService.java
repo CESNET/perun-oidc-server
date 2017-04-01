@@ -39,7 +39,7 @@ public class PerunAuthorizationCodeService extends RandomValueAuthorizationCodeS
 		AuthenticationHolderEntity authHolder = new AuthenticationHolderEntity();
 		authHolder.setAuthentication(authentication);
 		PerunWebAuthenticationDetails details = (PerunWebAuthenticationDetails) authentication.getUserAuthentication().getDetails();
-		authHolder.setExtensions(details.getAdditionalInfo());
+		authHolder.getExtensions().putAll(details.getAdditionalInfo());
 		authHolder = authenticationHolderRepository.save(authHolder);
 
 		// set the auth code to expire
