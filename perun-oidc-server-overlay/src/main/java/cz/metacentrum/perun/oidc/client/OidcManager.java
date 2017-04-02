@@ -14,6 +14,7 @@ import java.util.Map;
 public class OidcManager extends Manager {
 
     private static OidcManager manager;
+    private String USER_INFO_ENDPOINT = "getSpecificUserinfo";
 
     private OidcManager() {
     }
@@ -31,7 +32,7 @@ public class OidcManager extends Manager {
             Map<String, Object> params = new HashMap<>();
             params.put("user", userId);
             JsonParser parser = new JsonParser();
-            return DefaultUserInfo.fromJson(parser.parse(get("getSpecificUserinfo", params)).getAsJsonObject());
+            return DefaultUserInfo.fromJson(parser.parse(get(USER_INFO_ENDPOINT, params)).getAsJsonObject());
         } catch (IOException e) {
             throw new IllegalStateException("IO Error while getting userinfo from perun for user id " + userId, e);
         }
@@ -39,7 +40,8 @@ public class OidcManager extends Manager {
     }
 
     @Override
-    protected String getManagerName() {
+    public String getManagerName() {
         return "oidcManager";
     }
+
 }
