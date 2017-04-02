@@ -171,7 +171,7 @@ public class DiscoveryEndpoint {
         m.put("issuer", config.getIssuer());
         m.put("authorization_endpoint", baseUrl + "authorize");
         m.put("token_endpoint", baseUrl + "token");
-        m.put("userinfo_endpoint", perunConfig.getOidcPerunUrl()+ OidcManager.getInstance().getManagerName() + "/" + OidcManager.getInstance().getUserInfoEndpoint());
+        m.put("userinfo_endpoint", perunConfig.getOidcPerunUrl()+ OidcManager.getInstance().getManagerName() + "/userinfo");
         //check_session_iframe
         //end_session_endpoint
         m.put("jwks_uri", baseUrl + JWKSetPublishingEndpoint.URL);

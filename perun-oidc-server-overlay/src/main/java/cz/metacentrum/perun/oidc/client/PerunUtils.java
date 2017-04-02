@@ -67,7 +67,7 @@ public class PerunUtils {
 		return property;
 	}
 
-	public static List<String> getScopes() {
+	public static Set<String> getScopes() {
 		// Load scopes file
 		Properties properties = new Properties();
 		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(SCOPES_FILE))) {
@@ -78,14 +78,14 @@ public class PerunUtils {
 			throw new RuntimeException("Cannot read "+SCOPES_FILE+" file", e);
 		}
 
-		List<String> scopes = new ArrayList<>();
+		Set<String> scopes = new HashSet<>();
 		for (Object scope : properties.keySet()) {
 			scopes.add(scope.toString());
 		}
 		return scopes;
 	}
 
-	public static List<String> getClaims() {
+	public static Set<String> getClaims() {
 		// Load scopes file
 		Properties properties = new Properties();
 		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(SCOPES_FILE))) {
@@ -97,10 +97,10 @@ public class PerunUtils {
 		}
 
 		ObjectMapper mapper = new ObjectMapper();
-		List<String> claimsList = new ArrayList<>();
-		for (Object scope : properties.keySet()) {
+		Set<String> claimsList = new HashSet<>();
+		for (Object value : properties.values()) {
 			try {
-				ObjectNode claims = (ObjectNode) mapper.readTree(scope.toString());
+				ObjectNode claims = (ObjectNode) mapper.readTree(value.toString());
 				Iterator<String> iter = claims.getFieldNames();
 				while (iter.hasNext()) {
 					claimsList.add(iter.next());

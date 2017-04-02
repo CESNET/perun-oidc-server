@@ -18,7 +18,7 @@ package cz.metacentrum.perun.oidc.overlay;
 
 import cz.metacentrum.perun.oidc.client.PerunUtils;
 
-import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -37,11 +37,11 @@ public class PerunConfigurationBean {
 		return PerunUtils.getProperty("oidc.perun.url");
 	}
 
-	public List<String> getScopes() {
+	public Set<String> getScopes() {
 		return PerunUtils.getScopes();
 	}
 
-	public List<String> getClaims() {
+	public Set<String> getClaims() {
 		return PerunUtils.getClaims();
 	}
 

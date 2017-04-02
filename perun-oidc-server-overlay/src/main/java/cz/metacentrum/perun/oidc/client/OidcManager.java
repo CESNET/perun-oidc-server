@@ -44,7 +44,4 @@ public class OidcManager extends Manager {
         return "oidcManager";
     }
 
-    public String getUserInfoEndpoint() {
-        return USER_INFO_ENDPOINT;
-    }
 }
