@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.JWSAlgorithm;
 import cz.metacentrum.perun.oidc.client.OidcManager;
+import cz.metacentrum.perun.oidc.client.PerunUtils;
 import org.mitre.discovery.util.WebfingerURLNormalizer;
 import org.mitre.jwt.encryption.service.JWTEncryptionAndDecryptionService;
 import org.mitre.jwt.signer.service.JWTSigningAndValidationService;
@@ -171,7 +172,7 @@ public class DiscoveryEndpoint {
         m.put("issuer", config.getIssuer());
         m.put("authorization_endpoint", baseUrl + "authorize");
         m.put("token_endpoint", baseUrl + "token");
-        m.put("userinfo_endpoint", perunConfig.getOidcPerunUrl()+ OidcManager.getInstance().getManagerName() + "/userinfo");
+        m.put("userinfo_endpoint", PerunUtils.getProperty("oidc.userinfo.endpoint"));
         //check_session_iframe
         //end_session_endpoint
         m.put("jwks_uri", baseUrl + JWKSetPublishingEndpoint.URL);
