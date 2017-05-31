@@ -23,7 +23,7 @@
 	</appender>
 
 	<root level="info">
-		<appender-ref ref="oidc-server" />
+		<appender-ref ref="perun-oidc-server" />
 	</root>
 
 	<!-- keep Spring quiet -->
