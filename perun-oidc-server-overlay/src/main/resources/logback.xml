@@ -23,10 +23,12 @@
 	</appender>
 
 	<root level="info">
-		<appender-ref ref="perun-oidc-server" />
+		<appender-ref ref="perun-oidc-server"/>
 	</root>
 
 	<!-- keep Spring quiet -->
-	<logger name="org.springframework" level="warn"/>
+	<logger name="org.springframework" level="info"/>
+	<logger name="org.springframework.security" level="warn"/>
+	<logger name="org.springframework.web" level="warn"/>
 
 </configuration>
