@@ -13,35 +13,35 @@ import java.util.Map;
  */
 public class OidcManager extends Manager {
 
-    private static OidcManager manager;
-    private String USER_INFO_ENDPOINT = "getSpecificUserinfo";
+	private static OidcManager manager;
+	private String USER_INFO_ENDPOINT = "getSpecificUserinfo";
 
-    private OidcManager() {
-    }
+	private OidcManager() {
+	}
 
-    public static synchronized OidcManager getInstance() {
-        if (manager == null) {
-            manager = new OidcManager();
-        }
-        return manager;
-    }
+	public static synchronized OidcManager getInstance() {
+		if (manager == null) {
+			manager = new OidcManager();
+		}
+		return manager;
+	}
 
-    public UserInfo getSpecificUserinfo(Integer userId) {
+	public UserInfo getSpecificUserinfo(Integer userId) {
 
-        try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("user", userId);
-            JsonParser parser = new JsonParser();
-            return DefaultUserInfo.fromJson(parser.parse(get(USER_INFO_ENDPOINT, params)).getAsJsonObject());
-        } catch (IOException e) {
-            throw new IllegalStateException("IO Error while getting userinfo from perun for user id " + userId, e);
-        }
+		try {
+			Map<String, Object> params = new HashMap<>();
+			params.put("user", userId);
+			JsonParser parser = new JsonParser();
+			return DefaultUserInfo.fromJson(parser.parse(get(USER_INFO_ENDPOINT, params)).getAsJsonObject());
+		} catch (IOException e) {
+			throw new IllegalStateException("IO Error while getting userinfo from perun for user id " + userId, e);
+		}
 
-    }
+	}
 
-    @Override
-    public String getManagerName() {
-        return "oidcManager";
-    }
+	@Override
+	public String getManagerName() {
+		return "oidcManager";
+	}
 
 }

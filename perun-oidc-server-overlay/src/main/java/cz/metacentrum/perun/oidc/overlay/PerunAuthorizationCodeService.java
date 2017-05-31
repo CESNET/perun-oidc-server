@@ -67,11 +67,10 @@ public class PerunAuthorizationCodeService extends RandomValueAuthorizationCodeS
 	}
 
 
-
 	/**
 	 * Find and remove all expired auth codes.
 	 */
-	@Transactional(value="defaultTransactionManager")
+	@Transactional(value = "defaultTransactionManager")
 	public void clearExpiredAuthorizationCodes() {
 
 		Collection<AuthorizationCodeEntity> codes = repository.getExpiredCodes();

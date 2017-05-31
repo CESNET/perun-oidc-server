@@ -4,24 +4,10 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,8 +27,8 @@ public class PerunUtils {
 	 * Gets particular property from oidc-properties.properties file.
 	 *
 	 * @param propertyName name of the property
-	 * @param required if requested property is required. If it is and it is not defined, exception is thrown.
-	 *                 if it is false, null is returned.
+	 * @param required     if requested property is required. If it is and it is not defined, exception is thrown.
+	 *                     if it is false, null is returned.
 	 * @return value of the property, null if it is not defined
 	 */
 	public static String getProperty(String propertyName, boolean required) {
@@ -55,9 +41,9 @@ public class PerunUtils {
 		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(PROPERTIES_FILE))) {
 			properties.load(bis);
 		} catch (FileNotFoundException e) {
-			throw new IllegalArgumentException("Cannot find "+PROPERTIES_FILE+" file", e);
+			throw new IllegalArgumentException("Cannot find " + PROPERTIES_FILE + " file", e);
 		} catch (IOException e) {
-			throw new RuntimeException("Cannot read "+PROPERTIES_FILE+" file", e);
+			throw new RuntimeException("Cannot read " + PROPERTIES_FILE + " file", e);
 		}
 
 		String property = properties.getProperty(propertyName);
@@ -73,9 +59,9 @@ public class PerunUtils {
 		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(SCOPES_FILE))) {
 			properties.load(bis);
 		} catch (FileNotFoundException e) {
-			throw new IllegalArgumentException("Cannot find "+SCOPES_FILE+" file", e);
+			throw new IllegalArgumentException("Cannot find " + SCOPES_FILE + " file", e);
 		} catch (IOException e) {
-			throw new RuntimeException("Cannot read "+SCOPES_FILE+" file", e);
+			throw new RuntimeException("Cannot read " + SCOPES_FILE + " file", e);
 		}
 
 		Set<String> scopes = new HashSet<>();
@@ -91,9 +77,9 @@ public class PerunUtils {
 		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(SCOPES_FILE))) {
 			properties.load(bis);
 		} catch (FileNotFoundException e) {
-			throw new IllegalArgumentException("Cannot find "+SCOPES_FILE+" file", e);
+			throw new IllegalArgumentException("Cannot find " + SCOPES_FILE + " file", e);
 		} catch (IOException e) {
-			throw new RuntimeException("Cannot read "+SCOPES_FILE+" file", e);
+			throw new RuntimeException("Cannot read " + SCOPES_FILE + " file", e);
 		}
 
 		ObjectMapper mapper = new ObjectMapper();
@@ -106,7 +92,7 @@ public class PerunUtils {
 					claimsList.add(iter.next());
 				}
 			} catch (IOException e) {
-			throw new IllegalArgumentException("Config file "+ SCOPES_FILE +" is wrongly configured. Values have to be valid JSON objects.", e);
+				throw new IllegalArgumentException("Config file " + SCOPES_FILE + " is wrongly configured. Values have to be valid JSON objects.", e);
 			}
 		}
 		return claimsList;
@@ -129,13 +115,13 @@ public class PerunUtils {
 		if (req.getHeader("Shib-Identity-Provider") != null && !req.getHeader("Shib-Identity-Provider").isEmpty()) {
 			extSourceName = (String) req.getHeader("Shib-Identity-Provider");
 			extSourceType = EXTSOURCE_IDP;
-			if (req.getHeader("loa") != null && ! req.getHeader("loa").isEmpty()) {
+			if (req.getHeader("loa") != null && !req.getHeader("loa").isEmpty()) {
 				extSourceLoaString = req.getHeader("loa");
 			} else {
 				extSourceLoaString = "2";
 			}
 			// FIXME: find better place where do the operation with attributes from federation
-			if (req.getHeader("eppn") != null && ! req.getHeader("eppn").isEmpty()) {
+			if (req.getHeader("eppn") != null && !req.getHeader("eppn").isEmpty()) {
 				try {
 					String eppn = new String(req.getHeader("eppn").getBytes("ISO-8859-1"));
 
@@ -169,7 +155,7 @@ public class PerunUtils {
 
 		// X509 cert was used
 		// Cert must be last since Apache asks for certificate everytime and fills cert properties even when Kerberos is in place.
-		else if (extLogin == null && req.getAttribute("SSL_CLIENT_VERIFY") != null && ((String) req.getAttribute("SSL_CLIENT_VERIFY")).equals("SUCCESS")){
+		else if (extLogin == null && req.getAttribute("SSL_CLIENT_VERIFY") != null && ((String) req.getAttribute("SSL_CLIENT_VERIFY")).equals("SUCCESS")) {
 			extSourceName = (String) req.getAttribute("SSL_CLIENT_I_DN");
 			extSourceType = EXTSOURCE_X509;
 			extSourceLoaString = (String) req.getAttribute("EXTSOURCELOA");
@@ -190,7 +176,7 @@ public class PerunUtils {
 				try {
 					altNames = certs[0].getSubjectAlternativeNames();
 					if (altNames != null) {
-						for (List<?> entry: altNames) {
+						for (List<?> entry : altNames) {
 							if (((Integer) entry.get(0)) == 1) {
 								emails = (String) entry.get(1);
 							}
@@ -217,8 +203,8 @@ public class PerunUtils {
 
 		// Read all headers and store them in additionalInformation
 		String headerName = "";
-		for(@SuppressWarnings("unchecked") Enumeration<String> headerNames = req.getHeaderNames(); headerNames.hasMoreElements();){
-			headerName = (String)headerNames.nextElement();
+		for (@SuppressWarnings("unchecked") Enumeration<String> headerNames = req.getHeaderNames(); headerNames.hasMoreElements(); ) {
+			headerName = (String) headerNames.nextElement();
 			// Tomcat expects all headers are in ISO-8859-1
 			try {
 				additionalInformations.put(headerName, new String(req.getHeader(headerName).getBytes("ISO-8859-1")));
@@ -240,10 +226,10 @@ public class PerunUtils {
 
 		if (extLogin == null || extSourceName == null) {
 			throw new IllegalStateException("ExtSource name or userExtSourceLogin is null. " +
-					"extSourceName: "+extSourceName+", " +
-					"extLogin: "+extLogin+", " +
-					"extSourceLoa: "+extSourceLoa+", " +
-					"extSourceType: "+extSourceType);
+					"extSourceName: " + extSourceName + ", " +
+					"extLogin: " + extLogin + ", " +
+					"extSourceLoa: " + extSourceLoa + ", " +
+					"extSourceType: " + extSourceType);
 		}
 
 
@@ -252,9 +238,7 @@ public class PerunUtils {
 	}
 
 
-
-	public static boolean isWrapperType(Class<?> clazz)
-	{
+	public static boolean isWrapperType(Class<?> clazz) {
 		Set<Class<?>> ret = new HashSet<Class<?>>();
 		ret.add(Boolean.class);
 		ret.add(Character.class);
