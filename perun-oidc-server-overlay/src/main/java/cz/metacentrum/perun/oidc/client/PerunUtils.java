@@ -217,7 +217,7 @@ public class PerunUtils {
 
 		// Read all headers and store them in additionalInformation
 		String headerName = "";
-		for(Enumeration<String> headerNames = req.getHeaderNames(); headerNames.hasMoreElements();){
+		for(@SuppressWarnings("unchecked") Enumeration<String> headerNames = req.getHeaderNames(); headerNames.hasMoreElements();){
 			headerName = (String)headerNames.nextElement();
 			// Tomcat expects all headers are in ISO-8859-1
 			try {

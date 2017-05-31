@@ -24,6 +24,8 @@ import java.util.Properties;
 @Service
 public abstract class Manager {
 
+    private static final String UTF_8 = "UTF-8";
+
     @Resource(name="properties")
     private Properties properties;
 
@@ -86,7 +88,7 @@ public abstract class Manager {
                 StringBuilder sb = new StringBuilder();
                 String line;
                 while ((line = br.readLine()) != null) {
-                    sb.append(line + "\n");
+                    sb.append(line).append("\n");
                 }
                 br.close();
                 return sb.toString();
@@ -97,7 +99,7 @@ public abstract class Manager {
                 StringBuilder sb = new StringBuilder();
                 String line;
                 while ((line = br.readLine()) != null) {
-                    sb.append(line + "\n");
+                    sb.append(line).append("\n");
                 }
                 br.close();
                 String response = sb.toString();
@@ -129,15 +131,15 @@ public abstract class Manager {
             if(sb.length() > 0){
                 sb.append('&');
             }
-            String key = URLEncoder.encode(e.getKey(), "UTF-8");
+            String key = URLEncoder.encode(e.getKey(), UTF_8);
             String value;
             if (e.getValue() instanceof String) {
-                value = URLEncoder.encode(e.getValue().toString(), "UTF-8");
+                value = URLEncoder.encode(e.getValue().toString(), UTF_8);
             } else if (PerunUtils.isWrapperType(e.getValue().getClass())) {
-                value = URLEncoder.encode(e.getValue().toString(), "UTF-8");
+                value = URLEncoder.encode(e.getValue().toString(), UTF_8);
             } else {
                 ObjectMapper mapper = new ObjectMapper();
-                value = URLEncoder.encode(mapper.writeValueAsString(e.getValue()));
+                value = URLEncoder.encode(mapper.writeValueAsString(e.getValue()), UTF_8);
             }
 
             sb.append(key).append('=').append(value);
