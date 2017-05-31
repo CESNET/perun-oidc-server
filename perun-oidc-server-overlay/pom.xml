@@ -23,12 +23,17 @@
 
 		<dependency>
 			<groupId>org.mitre</groupId>
-			<artifactId>openid-connect-common</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.mitre</groupId>
 			<artifactId>openid-connect-server</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jcl-over-slf4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -46,6 +51,38 @@
 			<artifactId>postgresql</artifactId>
 		</dependency>
 
+		<!-- override logging from war overlay-->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.1.11</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.24</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>1.7.24</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<version>1.7.24</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>log4j-over-slf4j</artifactId>
+			<version>1.7.24</version>
+		</dependency>
 	</dependencies>
 
 
@@ -75,6 +112,12 @@
 						<overlay>
 							<groupId>org.mitre</groupId>
 							<artifactId>openid-connect-server-webapp</artifactId>
+							<excludes>
+								<exclude>WEB-INF/lib/slf4j-api-1.7.12.jar</exclude>
+								<exclude>WEB-INF/lib/slf4j-log4j12-1.7.12.jar</exclude>
+								<exclude>WEB-INF/lib/jcl-over-slf4j-1.7.12.jar</exclude>
+								<exclude>WEB-INF/lib/log4j-1.2.15.jar</exclude>
+							</excludes>
 						</overlay>
 					</overlays>
 				</configuration>
