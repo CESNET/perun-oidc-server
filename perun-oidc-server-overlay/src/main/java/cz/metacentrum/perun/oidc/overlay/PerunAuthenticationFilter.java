@@ -13,18 +13,22 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class PerunAuthenticationFilter extends AbstractPreAuthenticatedProcessingFilter {
 
-	@Override
-	protected Object getPreAuthenticatedPrincipal(HttpServletRequest httpServletRequest) {
-		PerunPrincipal pp = PerunUtils.parsePrincipal(httpServletRequest);
+    @Override
+    protected Object getPreAuthenticatedPrincipal(HttpServletRequest httpServletRequest) {
+        PerunPrincipal pp = PerunUtils.parsePrincipal(httpServletRequest);
 
-		PerunUser user = UsersManager.getInstance().getUserByExtSourceNameAndExtLogin(pp.getExtSourceName(), pp.getUserExtSourceLogin());
+        PerunUser user = UsersManager.getInstance().getUserByExtSourceNameAndExtLogin(pp.getExtSourceName(), pp.getUserExtSourceLogin());
 
-		return user.getId();
-	}
+        if (user == null) {
+            return null;
+        } else {
+            return user.getId();
+        }
+    }
 
-	@Override
-	protected Object getPreAuthenticatedCredentials(HttpServletRequest httpServletRequest) {
-		return "N/A";
-	}
+    @Override
+    protected Object getPreAuthenticatedCredentials(HttpServletRequest httpServletRequest) {
+        return "N/A";
+    }
 
 }
