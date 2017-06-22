@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.stereotype.Service;
 
+import javax.activation.UnsupportedDataTypeException;
 import javax.annotation.Resource;
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -99,8 +100,8 @@ public abstract class Manager {
 				br.close();
 				String response = sb.toString();
 
-				throw new IOException("UnsupportedDataTypeException: Fail while reading error response from Perun. Response data: " + response);
-			}
+                throw new UnsupportedDataTypeException("Fail while reading error response from Perun. Response data: " + response);
+            }
 
 		} finally {
 			if (c != null) {

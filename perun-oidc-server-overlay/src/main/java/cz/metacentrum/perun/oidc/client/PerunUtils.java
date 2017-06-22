@@ -237,8 +237,12 @@ public class PerunUtils {
 
 	}
 
+	public static String getClientId(HttpServletRequest req) {
+		return req.getParameter("client_id");
+	}
 
-	public static boolean isWrapperType(Class<?> clazz) {
+	public static boolean isWrapperType(Class<?> clazz)
+	{
 		Set<Class<?>> ret = new HashSet<Class<?>>();
 		ret.add(Boolean.class);
 		ret.add(Character.class);
