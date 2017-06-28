@@ -17,7 +17,10 @@ public class PerunAuthenticationFilter extends AbstractPreAuthenticatedProcessin
 	protected Object getPreAuthenticatedPrincipal(HttpServletRequest httpServletRequest) {
 		PerunPrincipal pp = PerunUtils.parsePrincipal(httpServletRequest);
 
-		PerunUser user = UsersManager.getInstance().getUserByExtSourceNameAndExtLogin(pp.getExtSourceName(), pp.getUserExtSourceLogin());
+		String extSourceName = pp.getExtSourceName();
+		String userExtSourceLogin = pp.getUserExtSourceLogin();
+
+		PerunUser user = UsersManager.getInstance().getUserByExtSourceNameAndExtLogin(extSourceName, userExtSourceLogin);
 
 		return user.getId();
 	}

@@ -5,23 +5,31 @@ import org.codehaus.jackson.node.ObjectNode;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
-import java.security.cert.CertificateParsingException;
-import java.security.cert.X509Certificate;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * @author Ondrej Velisek <ondrejvelisek@gmail.com>
  */
 public class PerunUtils {
 
-	public static final String EXTSOURCE_IDP = "cz.metacentrum.perun.core.impl.ExtSourceIdp";
-	public static final String EXTSOURCE_X509 = "cz.metacentrum.perun.core.impl.ExtSourceX509";
-	public static final String EXTSOURCE_NAME_LOCAL = "LOCAL";
+	private static final String EXTSOURCE_IDP = "cz.metacentrum.perun.core.impl.ExtSourceIdp";
+	private static final String EXTSOURCE_X509 = "cz.metacentrum.perun.core.impl.ExtSourceX509";
+	private static final String EXTSOURCE_NAME_LOCAL = "LOCAL";
 
 	private static final String PROPERTIES_FILE = "/etc/perun/perun-oidc-server.properties";
 	private static final String SCOPES_FILE = "/etc/perun/perun-oidc-scopes.properties";
+	private static final String SHIB_IDENTITY_PROVIDER = "Shib-Identity-Provider";
+	private static final String SSL_CLIENT_VERIFY = "SSL_CLIENT_VERIFY";
+	private static final String SUCCESS = "SUCCESS";
+	private static final String EXTSOURCE = "EXTSOURCE";
+	private static final String EXTSOURCETYPE = "EXTSOURCETYPE";
+	private static final String EXTSOURCELOA = "EXTSOURCELOA";
+	private static final String ENV_REMOTE_USER = "ENV_REMOTE_USER";
+	private static final String SSL_CLIENT_I_DN = "SSL_CLIENT_I_DN";
+	private static final String SSL_CLIENT_S_DN = "SSL_CLIENT_S_DN";
 
 	/**
 	 * Gets particular property from oidc-properties.properties file.
@@ -102,119 +110,69 @@ public class PerunUtils {
 		return getProperty(propertyName, true);
 	}
 
+	private static String getStringAttribute(HttpServletRequest req, String attributeName) {
+		return (String) req.getAttribute(attributeName);
+	}
+
 	public static PerunPrincipal parsePrincipal(HttpServletRequest req) {
 
-		String extSourceLoaString = null;
 		String extLogin = null;
 		String extSourceName = null;
+		String extSourceLoaString = null;
 		String extSourceType = null;
-		int extSourceLoa = 0;
-		Map<String, String> additionalInformations = new HashMap<String, String>();
+		int extSourceLoa;
 
 		// If we have header Shib-Identity-Provider, then the user uses identity federation to authenticate
-		if (req.getHeader("Shib-Identity-Provider") != null && !req.getHeader("Shib-Identity-Provider").isEmpty()) {
-			extSourceName = (String) req.getHeader("Shib-Identity-Provider");
-			extSourceType = EXTSOURCE_IDP;
-			if (req.getHeader("loa") != null && !req.getHeader("loa").isEmpty()) {
-				extSourceLoaString = req.getHeader("loa");
-			} else {
-				extSourceLoaString = "2";
-			}
-			// FIXME: find better place where do the operation with attributes from federation
-			if (req.getHeader("eppn") != null && !req.getHeader("eppn").isEmpty()) {
-				try {
-					String eppn = new String(req.getHeader("eppn").getBytes("ISO-8859-1"));
+		String shibIdentityProvider = getStringAttribute(req,SHIB_IDENTITY_PROVIDER);
+		String remoteUser = req.getRemoteUser();
 
-					// Remove scope from the eppn attribute
-					additionalInformations.put("eppnwoscope", eppn.replaceAll("(.*)@.*", "$1"));
-				} catch (UnsupportedEncodingException e) {
-					//log.error("Cannot encode header eppn with value from ISO-8859-1.");
-				}
-			}
-			if (req.getRemoteUser() != null && !req.getRemoteUser().isEmpty()) {
-				extLogin = req.getRemoteUser();
+		if (isNotEmpty(shibIdentityProvider)) {
+			extSourceName =  shibIdentityProvider;
+			extSourceType = EXTSOURCE_IDP;
+			extSourceLoaString = getStringAttribute(req, "loa");
+			if(isEmpty(extSourceLoaString)) extSourceLoaString = "2";
+			if (isNotEmpty(remoteUser)) {
+				extLogin = remoteUser;
 			}
 		}
 
 		// EXT_SOURCE was defined in Apache configuration (e.g. Kerberos or Local)
-		else if (req.getAttribute("EXTSOURCE") != null) {
-			extSourceName = (String) req.getAttribute("EXTSOURCE");
-			extSourceType = (String) req.getAttribute("EXTSOURCETYPE");
-			extSourceLoaString = (String) req.getAttribute("EXTSOURCELOA");
-
-			if (req.getRemoteUser() != null && !req.getRemoteUser().isEmpty()) {
-				extLogin = req.getRemoteUser();
-			} else if (req.getAttribute("ENV_REMOTE_USER") != null && !((String) req.getAttribute("ENV_REMOTE_USER")).isEmpty()) {
-				extLogin = (String) req.getAttribute("ENV_REMOTE_USER");
-			} else if (extSourceName.equals(EXTSOURCE_NAME_LOCAL)) {
-				/** LOCAL EXTSOURCE **/
-				// If ExtSource is LOCAL then generate REMOTE_USER name on the fly
-				extLogin = Long.toString(System.currentTimeMillis());
+		else if (req.getAttribute(EXTSOURCE) != null) {
+			extSourceName = getStringAttribute(req, EXTSOURCE);
+			extSourceType = getStringAttribute(req, EXTSOURCETYPE);
+			extSourceLoaString = getStringAttribute(req, EXTSOURCELOA);
+			if (isNotEmpty(remoteUser)) {
+				extLogin = remoteUser;
+			} else {
+				String env_remote_user = getStringAttribute(req, ENV_REMOTE_USER);
+				if (isNotEmpty(env_remote_user)) {
+					extLogin = env_remote_user;
+				} else if (extSourceName.equals(EXTSOURCE_NAME_LOCAL)) {
+					/* LOCAL EXTSOURCE */
+					// If ExtSource is LOCAL then generate REMOTE_USER name on the fly
+					extLogin = Long.toString(System.currentTimeMillis());
+				}
 			}
 		}
 
 		// X509 cert was used
 		// Cert must be last since Apache asks for certificate everytime and fills cert properties even when Kerberos is in place.
-		else if (extLogin == null && req.getAttribute("SSL_CLIENT_VERIFY") != null && ((String) req.getAttribute("SSL_CLIENT_VERIFY")).equals("SUCCESS")) {
-			extSourceName = (String) req.getAttribute("SSL_CLIENT_I_DN");
+		else if (Objects.equals(getStringAttribute(req,SSL_CLIENT_VERIFY), SUCCESS)) {
+			extSourceName = getStringAttribute(req, SSL_CLIENT_I_DN);
+			extLogin = getStringAttribute(req, SSL_CLIENT_S_DN);
 			extSourceType = EXTSOURCE_X509;
-			extSourceLoaString = (String) req.getAttribute("EXTSOURCELOA");
-			extLogin = (String) req.getAttribute("SSL_CLIENT_S_DN");
-
-			// Store X509
-			additionalInformations.put("SSL_CLIENT_S_DN", (String) req.getAttribute("SSL_CLIENT_S_DN"));
-			additionalInformations.put("dn", (String) req.getAttribute("SSL_CLIENT_S_DN"));
-
-			// Get the X.509 certificate object
-			X509Certificate[] certs = (X509Certificate[]) req.getAttribute("javax.servlet.request.X509Certificate");
-
-			// Get the emails
-			if (certs != null && certs.length > 0 && certs[0] != null) {
-				String emails = "";
-
-				Collection<List<?>> altNames;
-				try {
-					altNames = certs[0].getSubjectAlternativeNames();
-					if (altNames != null) {
-						for (List<?> entry : altNames) {
-							if (((Integer) entry.get(0)) == 1) {
-								emails = (String) entry.get(1);
-							}
-						}
-					}
-				} catch (CertificateParsingException e) {
-					//log.error("Error during parsing certificate {}", certs);
-				}
-
-				additionalInformations.put("mail", emails);
-
-				// Get organization from the certificate
-				String oRegExpPattern = "(o|O)(\\s)*=([^+,])*";
-				Pattern oPattern = Pattern.compile(oRegExpPattern);
-				Matcher oMatcher = oPattern.matcher(certs[0].getSubjectX500Principal().getName());
-				if (oMatcher.find()) {
-					String[] org = oMatcher.group().split("=");
-					if (org[1] != null && !org[1].isEmpty()) {
-						additionalInformations.put("o", org[1]);
-					}
-				}
-			}
+			extSourceLoaString = getStringAttribute(req, EXTSOURCELOA);
 		}
 
-		// Read all headers and store them in additionalInformation
-		String headerName = "";
-		for (@SuppressWarnings("unchecked") Enumeration<String> headerNames = req.getHeaderNames(); headerNames.hasMoreElements(); ) {
-			headerName = (String) headerNames.nextElement();
-			// Tomcat expects all headers are in ISO-8859-1
-			try {
-				additionalInformations.put(headerName, new String(req.getHeader(headerName).getBytes("ISO-8859-1")));
-			} catch (UnsupportedEncodingException e) {
-				//log.error("Cannot encode header {} with value from ISO-8859-1.", headerName, req.getHeader(headerName));
-			}
+		if (extLogin == null || extSourceName == null) {
+			throw new IllegalStateException("ExtSource name or userExtSourceLogin is null. " +
+					"extSourceName: " + extSourceName + ", " +
+					"extLogin: " + extLogin + ", "
+					);
 		}
 
 		// extSourceLoa must be number, if any specified then set to 0
-		if (extSourceLoaString == null || extSourceLoaString.isEmpty()) {
+		if (isEmpty(extSourceLoaString)) {
 			extSourceLoa = 0;
 		} else {
 			try {
@@ -224,22 +182,13 @@ public class PerunUtils {
 			}
 		}
 
-		if (extLogin == null || extSourceName == null) {
-			throw new IllegalStateException("ExtSource name or userExtSourceLogin is null. " +
-					"extSourceName: " + extSourceName + ", " +
-					"extLogin: " + extLogin + ", " +
-					"extSourceLoa: " + extSourceLoa + ", " +
-					"extSourceType: " + extSourceType);
-		}
-
-
 		return new PerunPrincipal(extSourceName, extLogin, extSourceLoa, extSourceType);
 
 	}
 
 
-	public static boolean isWrapperType(Class<?> clazz) {
-		Set<Class<?>> ret = new HashSet<Class<?>>();
+	static boolean isWrapperType(Class<?> clazz) {
+		Set<Class<?>> ret = new HashSet<>();
 		ret.add(Boolean.class);
 		ret.add(Character.class);
 		ret.add(Byte.class);
