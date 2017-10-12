@@ -6,12 +6,14 @@
 CREATE TEMPORARY TABLE IF NOT EXISTS authorities_TEMP (
       username varchar(50) not null,
       authority varchar(50) not null,
-      constraint ix_authority_TEMP unique (username,authority));
+      constraint ix_authority_TEMP unique (username,authority)
+);
       
 CREATE TEMPORARY TABLE IF NOT EXISTS users_TEMP (
       username varchar(50) not null primary key,
       password varchar(50) not null,
-      enabled boolean not null);
+      enabled boolean not null
+);
 
 CREATE TEMPORARY TABLE IF NOT EXISTS user_info_TEMP (
 	sub VARCHAR(256) not null primary key,
